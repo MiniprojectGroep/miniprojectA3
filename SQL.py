@@ -1,4 +1,4 @@
-import sqlite3
+, import sqlite3
 database = 'Thuisbioscoop.db'
 
 try:
@@ -38,4 +38,4 @@ connect.commit()
 # Just be sure any changes have been committed or they will be lost.
 connect.close()
 
-bezoekers = ['Jan Pietsma', 'Klaas van den Berg', 'Jacob Ozonlaag', 'Piet Dikkiedik', 'Nick Scheet', 'Jan Jamali', 'Frank Spijkerdop']
+bezoekers = ['Jan Pietsma', 'Klaas van den Berg', 'Jacob Ozonlaag', 'Piet Dikkiedik', 'Nick Scheet', 'Jan Jamali', 'Frank Spijkerdop', 'Alberto Spaghetti', 'Gert Samson', 'Octaaf de Raaf']

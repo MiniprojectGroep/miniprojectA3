@@ -37,3 +37,5 @@ connect.commit()
 # We can also close the connection if we are done with it.
 # Just be sure any changes have been committed or they will be lost.
 connect.close()
+
+bezoekers = ['Jan Pietsma', 'Klaas van den Berg', 'Jacob Ozonlaag', 'Piet Dikkiedik', 'Nick Scheet', 'Jan Jamali', 'Frank Spijkerdop']

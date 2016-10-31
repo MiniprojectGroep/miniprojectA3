@@ -11,7 +11,7 @@ tabel = 'accounts'
 
 # Create table
 c.execute('''CREATE TABLE IF NOT EXISTS accounts
-             (gebruikersnaam text, wachtwoord text, eindstation text)''')
+             (gebruikersnaam text, wachtwoord text, type text)''')
 
 '''
 iets = [('2006-03-28', 'Woerden', 'Harmelen', 45.00),

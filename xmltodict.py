@@ -9,5 +9,8 @@ def processXML(filename):
 filmdict = processXML("films.xml")
 films = filmdict["filmsoptv"]["film"]
 
+lst = []
 for film in films:
-    print(film["titel"])
+    lst.append(film['titel'])
+    
+print(lst)

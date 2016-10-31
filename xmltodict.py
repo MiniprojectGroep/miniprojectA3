@@ -7,7 +7,7 @@ def processXML(filename):
         return xmldictionary
 
 filmdict = processXML("films.xml")
-films = filmdict["films"]["film"]
+films = filmdict["filmsoptv"]["film"]
 
 for film in films:
-    print(film["film"])
+    print(film["titel"])

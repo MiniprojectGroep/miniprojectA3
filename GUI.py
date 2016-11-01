@@ -1,103 +1,53 @@
 from tkinter import *
 import math
+import login
+
+login.login() # Test
+
+global root
 root = Tk()
 
-'''
-import ctypes
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-'''
-def beginMenu():
+def showBeginMenu():
+    global linkerBeginFrame
+    linkerBeginFrame = Frame(master=root)
+    linkerBeginFrame.pack(side=LEFT)
 
-    # Maak 4 globale frames
-    global linkerFrame
-    linkerFrame = Frame(master=root)
-    linkerFrame.pack(side=LEFT)
+    global rechterBeginFrame
+    rechterBeginFrame = Frame(master=root)
+    rechterBeginFrame.pack(side=RIGHT)
 
-    global rechterframe
-    rechterFrame = Frame(master=root)
-    rechterFrame.pack(side=RIGHT)
+    global beginLabel
+    beginLabel = Label(master=rechterBeginFrame,text='Bent U een gebruiker of bent U een aanbieder?',background='darkgrey',foreground='blue',font=('Helvetica',10,'bold italic'),width=100,height=10)
+    beginLabel.pack()
 
-    global bovenFrame
-    bovenFrame = Frame(master=root)
-    bovenFrame.pack(side=TOP)
+    global beginAanbiederButton
+    buttonAanbiederButton = Button(master=linkerBeginFrame,command=aanbieder_menu,text='Aanbieder',height=3,width=20)
+    buttonAanbiederButton.pack(side=LEFT,pady=4,padx=25)
 
-    global benedenFrame
-    benedenFrame = Frame(master=root)
-    benedenFrame.pack(side=BOTTOM)
-
-    global keuzeFrame
-    keuzeFrame = Frame(master=root)
-    keuzeFrame.pack(side=LEFT)
-
-    global rechterLabelFrame
-    rechterLabelFrame = LabelFrame(rechterFrame, text="Main Window")
-    rechterLabelFrame.pack(fill="both", expand="yes")
-
-    global keuzeLabel
-    keuzeLabel = Label(master=rechterLabelFrame,text='Bent U een gebruiker of bent U een aanbieder?',background='darkgrey',foreground='blue',font=('Helvetica',10,'bold italic'),width=100,height=10)
-    keuzeLabel.pack()
-
-    createButton_aanbieder()
-    createButton_gebruiker()
+    global beginGebruikerButton
+    beginGebruikerButton = Button(master=linkerBeginFrame,command=gebruiker_menu,text='Gebruiker',height=3,width=20)
+    beginGebruikerButton.pack(side=RIGHT,pady=4,padx=25)
 
     root.mainloop()
+
+def hideBeginMenu():
+    linkerBeginFrame.destroy()
+    rechterBeginFrame.destroy()
+    beginLabel.destroy()
 
 def loginMenu():
     pass
 
-def createButton_aanbieder():
-    global button_aanbieder
-    button_aanbieder = Button(master=keuzeFrame,command=aanbieder_menu,text='Aanbieder',height=3,width=20)
-    button_aanbieder.pack(side=LEFT,pady=4,padx=25)
-
-def createButton_gebruiker():
-    global button_gebruiker
-    button_gebruiker = Button(master=keuzeFrame,command=gebruiker_menu,text='Gebruiker',height=3,width=20)
-    button_gebruiker.pack(side=RIGHT,pady=4,padx=25)
-
 def aanbieder_menu():
-    #keuzeframe.pack_forget() kan een memory leak veroorzaken
-    keuzeFrame.destroy()
+    #frame.pack_forget() kan een memory leak veroorzaken, probeer deze te vermijden!
+    hideBeginMenu()
+    global keuze
+    keuze = 'aanbieder'
 
 def gebruiker_menu():
-    keuzeFrame.destroy()
+    hideBeginMenu()
+    global keuze
+    keuze = 'gebruiker'
 
-
-def beginMenu():
-
-    # Maak 4 globale frames
-    global linkerFrame
-    linkerFrame = Frame(master=root)
-    linkerFrame.pack(side=LEFT)
-
-    global rechterframe
-    rechterFrame = Frame(master=root)
-    rechterFrame.pack(side=RIGHT)
-
-    global bovenFrame
-    bovenFrame = Frame(master=root)
-    bovenFrame.pack(side=TOP)
-
-    global benedenFrame
-    benedenFrame = Frame(master=root)
-    benedenFrame.pack(side=BOTTOM)
-
-    global keuzeFrame
-    keuzeFrame = Frame(master=root)
-    keuzeFrame.pack(side=LEFT)
-
-    global rechterLabelFrame
-    rechterLabelFrame = LabelFrame(rechterFrame, text="Main Window")
-    rechterLabelFrame.pack(fill="both", expand="yes")
-
-    global keuzeLabel
-    keuzeLabel = Label(master=rechterLabelFrame,text='Bent U een gebruiker of bent U een aanbieder?',background='darkgrey',foreground='blue',font=('Helvetica',10,'bold italic'),width=100,height=10)
-    keuzeLabel.pack()
-
-    createButton_aanbieder()
-    createButton_gebruiker()
-
-    root.mainloop()
-
-beginMenu()
+# start de GUI
+showBeginMenu()

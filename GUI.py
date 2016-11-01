@@ -2,12 +2,17 @@ from tkinter import *
 import math
 import login
 
-login.login() # Test
-
 global root
 root = Tk()
 
-def showBeginMenu():
+# Alle Menu's (GUI windows)
+def showTextMenu(text): # menu dat wordt gebruikt om de QR code, code na betaling of een ander bericht te weergeven
+    pass
+
+def hideTextMenu(): # verberg het TextMenu
+    pass
+
+def showBeginMenu(): # het begin menu waar de gebruiker kan kiezen of het een bezoeker (gebruiker) of een aanbieder is
     global linkerBeginFrame
     linkerBeginFrame = Frame(master=root)
     linkerBeginFrame.pack(side=LEFT)
@@ -30,24 +35,48 @@ def showBeginMenu():
 
     root.mainloop()
 
-def hideBeginMenu():
+def hideBeginMenu(): # verberg het BeginMenu
     linkerBeginFrame.destroy()
     rechterBeginFrame.destroy()
     beginLabel.destroy()
 
-def loginMenu():
+def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker kan kiezen of hij een kaartje wilt kopen, of dat hij al in bezit is van een kaartje.
     pass
 
-def aanbieder_menu():
+def hideKaartMenu(): # verberg het KaartMenu
+    pass
+
+def showBetalingsMenu(): # In dit menu moet de bezoeker zijn naam, email invullen en daarna betalen. Suggestie: misschien leuk om ook iets van een prijs te gebruiken, en dat de prijs wordt gebaseerd op de IMDB rating (2 * IMDB rating = prijs). Verder eventueel nog zaken zoals: weekend korting, kinder/senior korting. Maar dat hangt af of we tijd overhouden of niet.
+    pass
+
+def hideBetalingsMenu(): # verberg het betalings menu
+    pass
+
+def showLoginMenu(): # in dit menu moet de bezoeker inloggen met zijn naam en code. De aanbieder kan hier inloggen met zijn wachtwoord en gebruikersnaam. (Via SQLite3)
+    pass
+
+def hideLoginMenu(): # verberg het login menu
+    pass
+
+def showAanbiedersMenu(): #speciaal menu voor de aanbieder, hierkan hij een overzicht zien van alle films die niet worden aangeboden door een andere aanbieder, overzicht van alle films, overzicht val alle bezoekers die bij deze aanbieder zitten, aanmeldcode controleren
+    pass
+
+def hideAanbiedersMenu(): # verberg het AanbiedersMenu
+    pass
+
+# functies voor knoppen (buttons)
+def aanbieder_menu(): # Wordt gebruikt om de keuze te onthouden en naar het volgende menu te gaan
     #frame.pack_forget() kan een memory leak veroorzaken, probeer deze te vermijden!
     hideBeginMenu()
     global keuze
     keuze = 'aanbieder'
+    showLoginMenu()
 
-def gebruiker_menu():
+def gebruiker_menu(): # Zie aanbieder_menu
     hideBeginMenu()
     global keuze
     keuze = 'gebruiker'
+    showKaartMenu()
 
 # start de GUI
 showBeginMenu()

@@ -1,9 +1,21 @@
+# Modules
 from tkinter import *
 import math
-import login
+import sqlite3
 
-global root
+import io
+from PIL import Image, ImageTk
+# http://stackoverflow.com/questions/18562771/how-to-display-a-png-file-from-a-webpage-on-a-tk-label-in-python
+
+# Bestandsnamen
+import sql
+import API
+import common
+
+
 root = Tk()
+databaseNaam = 'Thuisbioscoop.db'
+xmlNaam = 'films.xml'
 
 # Alle Menu's (GUI windows)
 def showTextMenu(text): # menu dat wordt gebruikt om de QR code, code na betaling of een ander bericht te weergeven
@@ -41,7 +53,55 @@ def hideBeginMenu(): # verberg het BeginMenu
     beginLabel.destroy()
 
 def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker kan kiezen of hij een kaartje wilt kopen, of dat hij al in bezit is van een kaartje.
-    pass
+    global bovenKaartFrame
+    bovenKaartFrame = Frame(master=root)
+    bovenKaartFrame.pack(side=TOP)
+
+    global middenKaartFrame
+    middenKaartFrame = Frame(master=bovenKaartFrame)
+    middenKaartFrame.pack(side=BOTTOM)
+
+    global onderKaartFrame
+    onderKaartFrame = Frame(master=root)
+    onderKaartFrame.pack(side=BOTTOM)
+
+    global kaartLabel
+    kaartLabel = Label(master=bovenKaartFrame,text='Voor vandaag zijn er de volgende films op televisie',background='darkgrey',foreground='blue',font=('Helvetica',10,'bold italic'),width=50,height=10)
+    kaartLabel.pack(side=RIGHT)
+
+    global filmAfbeelding
+    filmAfbeelding = Label(master=bovenKaartFrame,image=None,background='black',width=20,height=10)
+    filmAfbeelding.pack()
+
+    scrollbar = Scrollbar(master=middenKaartFrame)
+    scrollbar.pack( side = LEFT, fill=Y )
+
+    global filmListbox
+    filmListbox = Listbox(master=middenKaartFrame, selectmode=SINGLE,width=50, yscrollcommand=scrollbar.set)
+    global filmLijst
+    filmLijst = common.getFilms(xmlNaam)
+
+    getal = 1
+    for film in filmLijst:
+        filmListbox.insert(getal, '{}'.format(film[0]))
+        getal =+ 1
+
+    filmListbox.pack(side = LEFT)
+    scrollbar.config( command = filmListbox.yview )
+
+    extraInfoButton = Button(master=middenKaartFrame,command=extraInfo,text='Meer informatie',height=3,width=30)
+    extraInfoButton.pack(side=RIGHT,pady=4,padx=25)
+
+    bestelKaartButton = Button(master=onderKaartFrame,command=bestelKaart,text='Bestel',height=3,width=30)
+    bestelKaartButton.pack(side=LEFT,pady=4,padx=25)
+
+    kaartIsBesteldButton = Button(master=onderKaartFrame,command=kaartIsBesteld,text='Ik heb al een kaartje',height=3,width=20)
+    kaartIsBesteldButton.pack(side=RIGHT,pady=4,padx=25)
+
+    terug = Button(master=onderKaartFrame,command=kaartIsBesteld,text='Vorig menu',height=3,width=20)
+    terug.pack(side=RIGHT,pady=4,padx=25)
+
+    root.mainloop()
 
 def hideKaartMenu(): # verberg het KaartMenu
     pass
@@ -78,5 +138,24 @@ def gebruiker_menu(): # Zie aanbieder_menu
     keuze = 'gebruiker'
     showKaartMenu()
 
+def bestelKaart():
+    pass
+
+def kaartIsBesteld():
+    pass
+
+def extraInfo():
+    tuple_getal = str(filmListbox.curselection())
+    film = tuple_getal[1]
+    film = int(film)
+    text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3])
+    kaartLabel['text'] = text
+    filmAfbeelding['image'] = filmLijst[film][4]
+
+def terug():
+    pass
+
 # start de GUI
+# API.getAPIDataToXML() > technische problemen met de API waardoor de actuele data niet kan worden opgehaald
+sql.startDatabase(databaseNaam)
 showBeginMenu()

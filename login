@@ -31,4 +31,4 @@ def login():
 
     except:
         print ('Error, kon niet verbinden met de database: {}'.format(database))
-    return False
+        return False

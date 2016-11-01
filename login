@@ -5,14 +5,13 @@ def login():
     try:
         connect = sqlite3.connect(database)
         c = connect.cursor()
-        tabel = 'accounts'
-
         # Create table
         c.execute('''CREATE TABLE IF NOT EXISTS accounts
-                     (gebruikersnaam text, wachtwoord text, type text)''')
-        '''c.executemany('INSERT INTO accounts VALUES (?,?,?)', iets)'''
+                     (gebruikersnaam text, emails text, wachtwoord text, type text)''')
 
+        global gebruikersnaam
         gebruikersnaam = input('gebruikersnaam') # Wordt later entry.get()
+        global wachtwoord
         wachtwoord = input('wachtwoord') # Wordt later entry.get()
         gegevens = [gebruikersnaam, wachtwoord]
 
@@ -23,20 +22,13 @@ def login():
         for resultaat in resultaten:
             if resultaat[0] == gebruikersnaam and resultaat[1] == wachtwoord:
                 connect.close()
-                
                 # data van gebruikersnaam en wachtwoord wissen ivm security redenen
-                gebruikersnaam = nil
-                wachtwoord = nil
-                
-                return True
-        
-        return False
-        '''Save (commit) the changes
-        connect.commit()
+                gebruikersnaam = None
+                wachtwoord = None
 
-        # We can also close the connection if we are done with it.
-        # Just be sure any changes have been committed or they will be lost.
-        connect.close()'''
+                return True
+        return False
+
     except:
         print ('Error, kon niet verbinden met de database: {}'.format(database))
-        return False
+    return False

@@ -1,14 +1,26 @@
-def login():
+def isDatabaseConnection(databasename):
     import sqlite3
-    database = 'Thuisbioscoop.db'
-
     try:
-        connect = sqlite3.connect(database)
+        connect = sqlite3.connect(databasename)
+        return True
+    except:
+        return False
+
+def startDatabase(databasename):
+    import sqlite3
+    if isDatabaseConnection(databasename) == True:
+        connect = sqlite3.connect(databasename)
         c = connect.cursor()
         # Create table
         c.execute('''CREATE TABLE IF NOT EXISTS accounts
-                     (gebruikersnaam text, emails text, wachtwoord text, type text)''')
+                         (gebruikersnaam text, emails text, wachtwoord text, type text)''')
 
+def isLoginCorrect():
+    import sqlite3
+    database = 'Thuisbioscoop.db'
+    if isDatabaseConnection(database) == True:
+        connect = sqlite3.connect(database)
+        c = connect.cursor()
         global gebruikersnaam
         gebruikersnaam = input('gebruikersnaam') # Wordt later entry.get()
         global wachtwoord
@@ -27,8 +39,4 @@ def login():
                 wachtwoord = None
 
                 return True
-        return False
-
-    except:
-        print ('Error, kon niet verbinden met de database: {}'.format(database))
         return False

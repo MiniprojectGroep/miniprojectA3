@@ -2,12 +2,14 @@
 from tkinter import *
 import math
 import sqlite3
+import random
 
 # Nodig voor een afbeelding
 from io import BytesIO
+import pyqrcode
 import urllib
 import urllib.request
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk # Installeer de module: Pillow
 # http://stackoverflow.com/questions/18562771/how-to-display-a-png-file-from-a-webpage-on-a-tk-label-in-python
 
 # Bestandsnamen
@@ -20,11 +22,49 @@ databaseNaam = 'Thuisbioscoop.db'
 xmlNaam = 'films.xml'
 
 # Alle Menu's (GUI windows)
-def showTextMenu(text): # menu dat wordt gebruikt om de QR code, code na betaling of een ander bericht te weergeven
-    pass
+def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling of een ander bericht te weergeven
+    global berichtFrame
+    berichtFrame = Frame(master=root)
+    berichtFrame.pack(side=BOTTOM)
 
-def hideTextMenu(): # verberg het TextMenu
-    pass
+    global bovenberichtFrame
+    bovenberichtFrame = Frame(master=root)
+    bovenberichtFrame.pack(side=TOP)
+
+    if berichtType == 'Code':
+        text = 'Noteer deze code, U heeft deze zodadelijk nodig om in te loggen met uw gebruikersnaam\nUw code is: {}'.format(code)
+
+        global huidigMenu
+        huidigMenu = 'Code'
+
+        berichtButton = Button(master=berichtFrame,command=volgendMenu,text='Ga verder',height=3,width=20)
+        berichtButton.pack(side=BOTTOM,pady=4,padx=25)
+
+        bericht = Label(master=bovenberichtFrame,text=text,background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=100,height=5)
+        bericht.pack(side=BOTTOM)
+
+        #QR code
+        big_code = pyqrcode.create(str(code), error='L', version=5, mode='binary')
+        big_code.png('code.png', scale=4, module_color=[0, 0, 0, 128], background=[0xff, 0xff, 0xcc])
+
+        img = ImageTk.PhotoImage(Image.open("code.png"))
+        qrcodeLabel = Label(master=berichtFrame, image = img)
+        qrcodeLabel.pack(side = BOTTOM)
+
+        root.mainloop()
+
+    elif berichtType == 'Einde':
+        text = 'Bedankt voor het gebruiken van de filmbioscoop applicatie. Veel plezier met het kijken van uw film!'
+
+    elif berichtType == 'Betalings Probleem':
+        text = 'Er is iets misgegaan met de betaling, probeer het later opnieuw.'
+
+    bericht = Label(master=bovenberichtFrame,text=text,background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=100,height=5)
+    bericht.pack(side=BOTTOM)
+
+def hideBerichtMenu(): # verberg het TextMenu
+    berichtFrame.destroy()
+    bovenberichtFrame.destroy()
 
 def showBeginMenu(): # het begin menu waar de gebruiker kan kiezen of het een bezoeker (gebruiker) of een aanbieder is
     global linkerBeginFrame
@@ -55,6 +95,9 @@ def hideBeginMenu(): # verberg het BeginMenu
     beginLabel.destroy()
 
 def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker kan kiezen of hij een kaartje wilt kopen, of dat hij al in bezit is van een kaartje.
+    global huidigMenu
+    huidigMenu = 'Kaart Menu'
+
     global bovenKaartFrame
     bovenKaartFrame = Frame(master=root)
     bovenKaartFrame.pack(side=TOP)
@@ -89,7 +132,7 @@ def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker
     filmListbox.pack(side = LEFT)
     scrollbar.config( command = filmListbox.yview )
 
-    extraInfoButton = Button(master=middenKaartFrame,command=extraInfo,text='Meer informatie',height=3,width=30)
+    extraInfoButton = Button(master=middenKaartFrame,command=extraInfo,text='Selecteer',height=3,width=30)
     extraInfoButton.pack(side=RIGHT,pady=4,padx=25)
 
     bestelKaartButton = Button(master=onderKaartFrame,command=bestelKaart,text='Bestel',height=3,width=30)
@@ -98,19 +141,62 @@ def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker
     kaartIsBesteldButton = Button(master=onderKaartFrame,command=kaartIsBesteld,text='Ik heb al een kaartje',height=3,width=20)
     kaartIsBesteldButton.pack(side=RIGHT,pady=4,padx=25)
 
-    terug = Button(master=onderKaartFrame,command=kaartIsBesteld,text='Vorig menu',height=3,width=20)
-    terug.pack(side=RIGHT,pady=4,padx=25)
+    terugButton = Button(master=onderKaartFrame,command=vorigMenu,text='Vorig menu',height=3,width=20)
+    terugButton.pack(side=RIGHT,pady=4,padx=25)
 
     root.mainloop()
 
 def hideKaartMenu(): # verberg het KaartMenu
-    pass
+    bovenKaartFrame.destroy()
+    middenKaartFrame.destroy()
+    onderKaartFrame.destroy()
 
 def showBetalingsMenu(): # In dit menu moet de bezoeker zijn naam, email invullen en daarna betalen. Suggestie: misschien leuk om ook iets van een prijs te gebruiken, en dat de prijs wordt gebaseerd op de IMDB rating (2 * IMDB rating = prijs). Verder eventueel nog zaken zoals: weekend korting, kinder/senior korting. Maar dat hangt af of we tijd overhouden of niet.
-    pass
+
+    global huidigMenu
+    huidigMenu = 'Betalings Menu'
+
+    global bovenBetalingsFrame
+    bovenBetalingsFrame = Frame(master=root)
+    bovenBetalingsFrame.pack(side=TOP)
+
+    global onderBetalingsFrame
+    onderBetalingsFrame = Frame(master=root)
+    onderBetalingsFrame.pack(side=BOTTOM)
+
+    emailBetalingsFrame = Frame(master=bovenBetalingsFrame)
+    emailBetalingsFrame.pack(side=BOTTOM)
+
+    gebruikersnaamBetalingsFrame = Frame(master=onderBetalingsFrame)
+    gebruikersnaamBetalingsFrame.pack(side=TOP)
+
+    text = 'Uw gekozen film: {}\n IMDB rating: {}\n Wij baseren onze prijs op de IMDB rating, ( IMDB rating * 2) = €{}'.format(filmtitel,imdbRating,prijs)
+    betalingsLabel = Label(master=bovenBetalingsFrame,text=text,background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=50,height=5)
+    betalingsLabel.pack()
+
+    gebruikersnaamLabel = Label(master=gebruikersnaamBetalingsFrame, text="Gebruikersnaam")
+    gebruikersnaamLabel.pack(side=LEFT)
+
+    global gebruikersnaamEntry
+    gebruikersnaamEntry = Entry(master=gebruikersnaamBetalingsFrame, bd=5)
+    gebruikersnaamEntry.pack(side = RIGHT)
+
+    emailLabel = Label(master=emailBetalingsFrame, text="E-mail")
+    emailLabel.pack(side=LEFT)
+
+    global emailEntry
+    emailEntry = Entry(master=emailBetalingsFrame, bd=5)
+    emailEntry.pack(side = RIGHT)
+
+    betaalBetalingsButton = Button(master=onderBetalingsFrame,command=registeerGebruiker,text='Betaal',height=3,width=20,bg='darkgreen')
+    betaalBetalingsButton.pack(side=LEFT,pady=4,padx=25)
+
+    terugButton = Button(master=onderBetalingsFrame,command=vorigMenu,text='Vorig Menu',height=3,width=20)
+    terugButton.pack(side=RIGHT,pady=4,padx=25)
 
 def hideBetalingsMenu(): # verberg het betalings menu
-    pass
+    bovenBetalingsFrame.destroy()
+    onderBetalingsFrame.destroy()
 
 def showLoginMenu(): # in dit menu moet de bezoeker inloggen met zijn naam en code. De aanbieder kan hier inloggen met zijn wachtwoord en gebruikersnaam. (Via SQLite3)
     pass
@@ -139,16 +225,27 @@ def gebruiker_menu(): # Zie aanbieder_menu
     showKaartMenu()
 
 def bestelKaart():
-    pass
+    hideKaartMenu()
+    showBetalingsMenu()
 
 def kaartIsBesteld():
-    pass
+    hideKaartMenu()
+    showLoginMenu()
 
 def extraInfo():
     tuple_getal = str(filmListbox.curselection())
     film = tuple_getal[1]
     film = int(film)
-    text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3])
+
+    global prijs
+    prijs = (float(filmLijst[film][3]) * 2)
+    global filmtitel
+    filmtitel = filmLijst[film][0]
+    global imdbRating
+    imdbRating = filmLijst[film][3]
+
+    # lst[x][0] = titel, lst[x][1] = genre, lst[x][2] = jaar, lst[x][3] = imdb_rating, lst[x][4] = afbeelding_URL, lst[x][5] = film_nummer (Wordt gebruikt voor ListBox), lst[x][6] = Zender, lst[x][7] = start tijd, lst[x][8] = eindtijd
+    text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}\n Prijs: €{}\n Duur: {} - {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3],prijs,filmLijst[film][7], filmLijst[film][8])
     kaartLabel['text'] = text
 
     # Nodig om een afbeelding via URL weer te geven
@@ -165,11 +262,48 @@ def extraInfo():
     filmAfbeelding['width'] = 200
     root.mainloop()
 
-def terug():
-    pass
+def registeerGebruiker():
+    global gebruikersnaam
+    gebruikersnaam = gebruikersnaamEntry.get()
+
+    global email
+    email = emailEntry.get()
+
+    global code
+    code = random.randint(1000,9999) # random string
+
+    # if sql.register == True:
+    hideBetalingsMenu()
+    global berichtType
+    berichtType = 'Code'
+
+    showBerichtMenu()
+    # else
+        # text bericht dat het niet gelukt is (kan alleen voorkomen als de gebruiker niet genoeg geld op zijn rekening heeft
+
+def vorigMenu():
+    if huidigMenu == 'Kaart Menu':
+        hideKaartMenu()
+        showBeginMenu()
+    elif huidigMenu == 'Betalings Menu':
+        hideBetalingsMenu()
+        showKaartMenu()
+    elif huidigMenu == 'Gebruikers Inlog Menu':
+        hideLoginMenu()
+        showKaartMenu()
+    elif huidigMenu == 'Aanbieders Inlog Menu':
+        hideLoginMenu()
+        showBeginMenu()
+    elif huidigMenu == 'Aanbieders Menu':
+        hideAanbiedersMenu()
+        showBeginMenu()
+
+def volgendMenu():
+    if huidigMenu == 'Code':
+        hideBerichtMenu()
+        showLoginMenu()
 
 # start de GUI
 API.getAPIDataToXML()
 sql.startDatabase(databaseNaam)
-
 showBeginMenu()

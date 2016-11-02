@@ -3,7 +3,10 @@ from tkinter import *
 import math
 import sqlite3
 
-import io
+# Nodig voor een afbeelding
+from io import BytesIO
+import urllib
+import urllib.request
 from PIL import Image, ImageTk
 # http://stackoverflow.com/questions/18562771/how-to-display-a-png-file-from-a-webpage-on-a-tk-label-in-python
 
@@ -11,7 +14,6 @@ from PIL import Image, ImageTk
 import sql
 import API
 import common
-
 
 root = Tk()
 databaseNaam = 'Thuisbioscoop.db'
@@ -71,7 +73,7 @@ def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker
 
     global filmAfbeelding
     filmAfbeelding = Label(master=bovenKaartFrame,image=None,background='black',width=20,height=10)
-    filmAfbeelding.pack()
+    filmAfbeelding.pack( fill = Y)
 
     scrollbar = Scrollbar(master=middenKaartFrame)
     scrollbar.pack( side = LEFT, fill=Y )
@@ -81,10 +83,8 @@ def showKaartMenu(): # In dit menu moet de bezoeker een film kiezen. De bezoeker
     global filmLijst
     filmLijst = common.getFilms(xmlNaam)
 
-    getal = 1
     for film in filmLijst:
-        filmListbox.insert(getal, '{}'.format(film[0]))
-        getal =+ 1
+        filmListbox.insert(film[5], '{}'.format(film[0]))
 
     filmListbox.pack(side = LEFT)
     scrollbar.config( command = filmListbox.yview )
@@ -150,12 +150,26 @@ def extraInfo():
     film = int(film)
     text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3])
     kaartLabel['text'] = text
-    filmAfbeelding['image'] = filmLijst[film][4]
+
+    # Nodig om een afbeelding via URL weer te geven
+    url = filmLijst[film][4]
+    with urllib.request.urlopen(url) as u:
+        raw_data = u.read()
+    im = Image.open(BytesIO(raw_data))
+    image = ImageTk.PhotoImage(im)
+
+    # Afbeelding moet een resize krijgen, deze methode zorgt er alleen voor dat de lengte en de breedte past. Afbeelding kan dus niet volledig worden weergegeven.
+
+    filmAfbeelding['image'] = image
+    filmAfbeelding['height'] = 150
+    filmAfbeelding['width'] = 200
+    root.mainloop()
 
 def terug():
     pass
 
 # start de GUI
-# API.getAPIDataToXML() > technische problemen met de API waardoor de actuele data niet kan worden opgehaald
+API.getAPIDataToXML()
 sql.startDatabase(databaseNaam)
+
 showBeginMenu()

@@ -13,7 +13,13 @@ def startDatabase(databasename):
         c = connect.cursor()
         # Create table
         c.execute('''CREATE TABLE IF NOT EXISTS accounts
-                         (gebruikersnaam text, emails text, wachtwoord text, type text)''')
+                         (gebruikersnaam text UNIQUE, emails text, wachtwoord text, type text)''')
+        
+        c.execute('''CREATE TABLE IF NOT EXISTS aanbieders
+                         (aanbieder text UNIQUE, wachtwoord text, type text)''')
+        
+        c.execute('''CREATE TABLE IF NOT EXISTS films
+                        (filmnaam text UNIQUE, aanbieder text, aantal_bezoekers int)''')
 
 def isLoginCorrect():
     import sqlite3

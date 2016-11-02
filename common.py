@@ -16,6 +16,7 @@ def getFilms(bestand):
     # lst[x][0] = titel, lst[x][1] = genre, lst[x][2] = jaar, lst[x][3] = imdb_rating, lst[x][4] = afbeelding_URL
 
     lst = []
+    film_nummer = 1
     for film in films:
         temp_list = []
         temp_list.append(str(film['titel']))
@@ -23,8 +24,7 @@ def getFilms(bestand):
         temp_list.append(str(film['jaar']))
         temp_list.append(str(film['imdb_rating']))
         temp_list.append(str(film['cover']))
+        temp_list.append(film_nummer)
         lst.append(temp_list)
-
-    for item in lst:
-        print(item[4])
+        film_nummer += 1
     return lst

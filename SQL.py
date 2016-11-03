@@ -38,4 +38,15 @@ connect.commit()
 # Just be sure any changes have been committed or they will be lost.
 connect.close()
 
-bezoekers = ['Jan Pietsma', 'Klaas van den Berg', 'Jacob Ozonlaag', 'Piet Dikkiedik', 'Nick Scheet', 'Jan Jamali', 'Frank Spijkerdop', 'Alberto Spaghetti', 'Gert Samson', 'Octaaf de Raaf']
+CREATE TABLE (id INTEGER, bezoeker NAAM, film FILMOFTIJD)
+
+INSERT INTO bezoeker VALUES (1, "Jack Pieters", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (2, "Klaas Bergjes", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (3, "Jacob Ozonlaag", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (4, "Piet Dikkiedik", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (5, "Nick Scheet", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (6, "Jan Jamal", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (7, "Frank Spijkerdop", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (8, "Alberto Spaghetti", 'filmoffilmtijdhier');
+INSERT INTO bezoeker VALUES (9, "Gert Samson", 'filmoffilmtijdhier')
+INSERT INTO bezoeker VALUES (10, "Benny Vogelhuis", 'filmoffilmtijdhier')

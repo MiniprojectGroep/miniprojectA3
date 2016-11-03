@@ -1,7 +1,5 @@
 # Modules
 from tkinter import *
-import math
-import sqlite3
 import random
 
 # Nodig voor een afbeelding
@@ -12,8 +10,8 @@ import urllib.request
 from PIL import Image, ImageTk # Installeer de module: Pillow
 
 # functies van zelf gemaakte bestanden
-import sql
 import API
+import sql
 import common
 
 root = Tk()
@@ -31,6 +29,7 @@ def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling
     global bovenberichtFrame
     bovenberichtFrame = Frame(master=root)
     bovenberichtFrame.pack(side=TOP)
+    text = ''
 
     if berichtType == 'Code':
         text = 'Noteer deze code, U heeft deze zodadelijk nodig om in te loggen met uw gebruikersnaam\nUw code is: {}'.format(code)
@@ -54,7 +53,7 @@ def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling
 
     elif berichtType == 'Einde':
         huidigMenu = 'Einde'
-        text = 'Bedankt voor het gebruiken van de filmbioscoop applicatie. Veel plezier met het kijken van uw film!'
+        text = 'Uw film: {}\nStarttijd:{}\n\nBedankt voor het gebruiken van de filmbioscoop applicatie. Veel plezier met het kijken van uw film!'.format(filmNaamEnTijd[0],filmNaamEnTijd[1])
 
         berichtButton = Button(master=berichtFrame,command=vorigMenu,text='Ga terug naar het begin menu',height=3,width=30,bg='darkorange')
         berichtButton.pack(side=BOTTOM,pady=4,padx=25)
@@ -173,7 +172,7 @@ def showBetalingsMenu(): # In dit menu moet de bezoeker zijn naam, email invulle
     gebruikersnaamBetalingsFrame.pack(side=TOP)
 
     text = 'Uw gekozen film: {}\n IMDB rating: {}\n Wij baseren onze prijs op de IMDB rating, ( IMDB rating * 2) = €{}'.format(filmtitel,imdbRating,prijs)
-    betalingsLabel = Label(master=bovenBetalingsFrame,text=text,background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=50,height=5)
+    betalingsLabel = Label(master=bovenBetalingsFrame,text=text,background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=70,height=5)
     betalingsLabel.pack()
 
     gebruikersnaamLabel = Label(master=gebruikersnaamBetalingsFrame, text="Gebruikersnaam")
@@ -221,7 +220,8 @@ def showLoginMenu(): # in dit menu moet de bezoeker inloggen met zijn naam en co
     onderLoginFrame = Frame(master=root)
     onderLoginFrame.pack(side=BOTTOM)
 
-    informatieLoginLabel = Label(master=bovenLoginFrame,text='Vul uw gebruikersnaam en code in.',background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=40,height=5)
+    global informatieLoginLabel
+    informatieLoginLabel = Label(master=bovenLoginFrame,text='Vul uw gebruikersnaam en code in.',background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=60,height=5)
     informatieLoginLabel.pack(side=TOP)
 
     global gebruikersnaamLoginEntry
@@ -320,7 +320,11 @@ def registeerGebruiker():
     gebruikersnaam = gebruikersnaamEntry.get()
     email = emailEntry.get()
     global code
-    code = random.randint(1000,9999) # random string
+
+    while True:
+        code = random.randint(100000,999999) # random string
+        if sql.isCodeUnique(code) == True:
+            break
 
     lst.append(gebruikersnaam)
     lst.append(email)
@@ -350,12 +354,16 @@ def loginGebruiker():
     print(wachtwoord)
 
     if sql.isLoginCorrect(gebruikersnaam, wachtwoord) == True:
+        global filmNaamEnTijd
+        filmNaamEnTijd = sql.getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord)
+
         global berichtType
         berichtType = 'Einde'
         hideLoginMenu()
         showBerichtMenu()
     else:
-        print('De opgegeven gebruikersnaam en/of wachtwoord is/zijn onjuist')
+        informatieLoginLabel['text'] = 'De opgegeven gebruikersnaam en/of wachtwoord is/zijn onjuist.\nProbeer het opnieuw'
+        informatieLoginLabel['foreground'] = 'red'
 
 def loginAanbieder():
     hideLoginMenu()
@@ -389,6 +397,9 @@ def volgendMenu():
         showLoginMenu()
 
 # start de GUI
+
 API.getAPIDataToXML()
-sql.startDatabase(databaseNaam)
+sql.startDatabase('Thuisbioscoop.db')
+sql.registeerAanbieders()
+sql.createFilmsTableData(common.getFilmTableDataList('films.xml'))
 showBeginMenu()

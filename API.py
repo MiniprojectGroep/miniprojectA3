@@ -13,12 +13,17 @@ def getAPIDataToXML():
 
     response = requests.get(link)
 
-    str = response.text
- # In de API wordt er soms (1-11-2016 en 2-11-2016) een ' ; ' in het XML geleverd, als deze niet verwijdert wordt dan kan dit ervoor zorgen dat het XML bestand onleesbaar wordt
-    str = str.replace('&','')
-    str = str.replace(';','')
+    string = response.text
+ # In de API wordt er soms (1-11-2016 en 2-11-2016) een ' ; ' ,of er zit een encoding fout in het bestand, in het XML geleverd, als deze niet verwijdert of aangepast worden dan kan dit ervoor zorgen dat het XML bestand onleesbaar wordt
+    string = string.replace('&eacute;', 'é') # &eacure; staat voor ' é '
+    string = string.replace('&euml;','ë') # &euml; staat voor ' ë '
+    string = string.replace('<?xml version="1.0" encoding="iso-8859-1"?>','<?xml version="1.0" encoding="UTF-8"?>' ) # zorgt ook voor en error??
+    string = string.replace(';','') # Haal onbekende encodingselementen weg zodat het XML kan blijven functioneren
+    string = string.replace('&','')
+    string = string.replace('','') # Haal onbekende  tekensweg
+    new_str = str(string)
     with open(file,'w')as filmsXML:
         try:
-            filmsXML.write(str)
+            filmsXML.write(new_str)
         except:
             print('Error in de API')

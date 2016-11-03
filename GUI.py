@@ -294,6 +294,8 @@ def extraInfo():
     filmtitel = filmLijst[film][0]
     global imdbRating
     imdbRating = filmLijst[film][3]
+    global filmStartTijd
+    filmStartTijd = filmLijst[film][7]
 
     # lst[x][0] = titel, lst[x][1] = genre, lst[x][2] = jaar, lst[x][3] = imdb_rating, lst[x][4] = afbeelding_URL, lst[x][5] = film_nummer (Wordt gebruikt voor ListBox), lst[x][6] = Zender, lst[x][7] = start tijd, lst[x][8] = eindtijd
     text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}\n Prijs: €{}\n Duur: {} - {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3],prijs,filmLijst[film][7], filmLijst[film][8])
@@ -307,38 +309,53 @@ def extraInfo():
     image = ImageTk.PhotoImage(im)
 
     # Afbeelding moet een resize krijgen, deze methode zorgt er alleen voor dat de lengte en de breedte past. Afbeelding kan dus niet volledig worden weergegeven.
-
     filmAfbeelding['image'] = image
     filmAfbeelding['height'] = 150
     filmAfbeelding['width'] = 200
     root.mainloop()
 
 def registeerGebruiker():
-    global gebruikersnaam
+    lst = []
+
     gebruikersnaam = gebruikersnaamEntry.get()
-
-    global email
     email = emailEntry.get()
-
     global code
     code = random.randint(1000,9999) # random string
 
-    # if sql.register == True:
-    hideBetalingsMenu()
-    global berichtType
-    berichtType = 'Code'
+    lst.append(gebruikersnaam)
+    lst.append(email)
+    lst.append(code)
+    lst.append(filmtitel)
+    lst.append(filmStartTijd)
+    lst.append(keuze)
 
-    showBerichtMenu()
-    # else
-        # text bericht dat het niet gelukt is (kan alleen voorkomen als de gebruiker niet genoeg geld op zijn rekening heeft
+    if gebruikersnaam == '' or email == '':
+        print('U moet een gebruikersnaam of email invullen!') # label van maken
+    else:
+        if sql.registreerGebruiker(lst) == True:
+            hideBetalingsMenu()
+            global berichtType
+            berichtType = 'Code'
+            showBerichtMenu()
+        else:
+            print('bericht dat het niet gelukt is (kan alleen voorkomen als de gebruiker niet genoeg geld op zijn rekening heeft')
+
+    lst = [] #verwijder data uit de list
 
 def loginGebruiker():
-    global berichtType
-    berichtType = 'Einde'
+    gebruikersnaam = gebruikersnaamLoginEntry.get()
+    wachtwoord = codeLoginEntry.get()
 
-    # if sql.login == True
-    hideLoginMenu()
-    showBerichtMenu()
+    print(gebruikersnaam)
+    print(wachtwoord)
+
+    if sql.isLoginCorrect(gebruikersnaam, wachtwoord) == True:
+        global berichtType
+        berichtType = 'Einde'
+        hideLoginMenu()
+        showBerichtMenu()
+    else:
+        print('De opgegeven gebruikersnaam en/of wachtwoord is/zijn onjuist')
 
 def loginAanbieder():
     hideLoginMenu()

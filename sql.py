@@ -12,25 +12,23 @@ def startDatabase(databasename):
         connect = sqlite3.connect(databasename)
         c = connect.cursor()
         # Create table
+
+        #
         c.execute('''CREATE TABLE IF NOT EXISTS accounts
-                         (gebruikersnaam text UNIQUE, emails text, wachtwoord text, type text)''')
-        
+                         (gebruikersnaam text, email text, wachtwoord text, filmnaam text, filmstarttijd text, type text)''')
+
         c.execute('''CREATE TABLE IF NOT EXISTS aanbieders
                          (aanbieder text UNIQUE, wachtwoord text, type text)''')
-        
+
         c.execute('''CREATE TABLE IF NOT EXISTS films
                         (filmnaam text UNIQUE, aanbieder text, aantal_bezoekers int)''')
 
-def isLoginCorrect():
+def isLoginCorrect(gebruikersnaam, wachtwoord):
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
         connect = sqlite3.connect(database)
         c = connect.cursor()
-        global gebruikersnaam
-        gebruikersnaam = input('gebruikersnaam') # Wordt later entry.get()
-        global wachtwoord
-        wachtwoord = input('wachtwoord') # Wordt later entry.get()
         gegevens = [gebruikersnaam, wachtwoord]
 
         c.execute('''SELECT * FROM accounts WHERE gebruikersnaam = ? AND wachtwoord = ?''',gegevens)
@@ -45,4 +43,20 @@ def isLoginCorrect():
                 wachtwoord = None
 
                 return True
+        return False
+
+def registreerGebruiker(lst):
+    try:
+        import sqlite3
+        database = 'Thuisbioscoop.db'
+        if isDatabaseConnection(database) == True:
+            connect = sqlite3.connect(database)
+            c = connect.cursor()
+            c.execute('INSERT INTO accounts VALUES (?,?,?,?,?,?)', lst)
+            connect.commit()
+            connect.close()
+            return True
+        else:
+            return False
+    except:
         return False

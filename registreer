@@ -1,0 +1,6 @@
+def registreer():
+    gebruikersnaam = input('wat is uw gebruikersnaam')
+    wachtwoord= input('wat is uw wachtwoord')
+    type= input('bent u een aanbieder of een gebruiker')
+    account=[gebruikersnaam, wachtwoord, type]
+    c.executemany('INSERT INTO accounts VALUES (?,?,?)', account)

@@ -10,9 +10,8 @@ import pyqrcode
 import urllib
 import urllib.request
 from PIL import Image, ImageTk # Installeer de module: Pillow
-# http://stackoverflow.com/questions/18562771/how-to-display-a-png-file-from-a-webpage-on-a-tk-label-in-python
 
-# Bestandsnamen
+# functies van zelf gemaakte bestanden
 import sql
 import API
 import common
@@ -23,6 +22,8 @@ xmlNaam = 'films.xml'
 
 # Alle Menu's (GUI windows)
 def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling of een ander bericht te weergeven
+    global huidigMenu
+
     global berichtFrame
     berichtFrame = Frame(master=root)
     berichtFrame.pack(side=BOTTOM)
@@ -33,8 +34,6 @@ def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling
 
     if berichtType == 'Code':
         text = 'Noteer deze code, U heeft deze zodadelijk nodig om in te loggen met uw gebruikersnaam\nUw code is: {}'.format(code)
-
-        global huidigMenu
         huidigMenu = 'Code'
 
         berichtButton = Button(master=berichtFrame,command=volgendMenu,text='Ga verder',height=3,width=20)
@@ -54,7 +53,11 @@ def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling
         root.mainloop()
 
     elif berichtType == 'Einde':
+        huidigMenu = 'Einde'
         text = 'Bedankt voor het gebruiken van de filmbioscoop applicatie. Veel plezier met het kijken van uw film!'
+
+        berichtButton = Button(master=berichtFrame,command=vorigMenu,text='Ga terug naar het begin menu',height=3,width=30,bg='darkorange')
+        berichtButton.pack(side=BOTTOM,pady=4,padx=25)
 
     elif berichtType == 'Betalings Probleem':
         text = 'Er is iets misgegaan met de betaling, probeer het later opnieuw.'
@@ -152,7 +155,6 @@ def hideKaartMenu(): # verberg het KaartMenu
     onderKaartFrame.destroy()
 
 def showBetalingsMenu(): # In dit menu moet de bezoeker zijn naam, email invullen en daarna betalen. Suggestie: misschien leuk om ook iets van een prijs te gebruiken, en dat de prijs wordt gebaseerd op de IMDB rating (2 * IMDB rating = prijs). Verder eventueel nog zaken zoals: weekend korting, kinder/senior korting. Maar dat hangt af of we tijd overhouden of niet.
-
     global huidigMenu
     huidigMenu = 'Betalings Menu'
 
@@ -199,10 +201,59 @@ def hideBetalingsMenu(): # verberg het betalings menu
     onderBetalingsFrame.destroy()
 
 def showLoginMenu(): # in dit menu moet de bezoeker inloggen met zijn naam en code. De aanbieder kan hier inloggen met zijn wachtwoord en gebruikersnaam. (Via SQLite3)
-    pass
+    global huidigMenu
+    huidigMenu = 'Gebruikers Inlog Menu'
+
+    global bovenLoginFrame
+    bovenLoginFrame = Frame(master=root)
+    bovenLoginFrame.pack(side=TOP)
+
+    middenLoginFrame = Frame(master=bovenLoginFrame)
+    middenLoginFrame.pack(side=BOTTOM)
+
+    gebruikersnaamLoginFrame = Frame(master=middenLoginFrame)
+    gebruikersnaamLoginFrame.pack(side=TOP)
+
+    codeLoginFrame = Frame(master=middenLoginFrame)
+    codeLoginFrame.pack(side=BOTTOM)
+
+    global onderLoginFrame
+    onderLoginFrame = Frame(master=root)
+    onderLoginFrame.pack(side=BOTTOM)
+
+    informatieLoginLabel = Label(master=bovenLoginFrame,text='Vul uw gebruikersnaam en code in.',background='darkgrey',foreground='black',font=('Helvetica',10,'bold italic'),width=40,height=5)
+    informatieLoginLabel.pack(side=TOP)
+
+    global gebruikersnaamLoginEntry
+    gebruikersnaamLoginEntry = Entry(master=gebruikersnaamLoginFrame, bd=5)
+    gebruikersnaamLoginEntry.pack(side = RIGHT)
+
+    gebruikersnaamLabel = Label(master=gebruikersnaamLoginFrame, text="Gebruikersnaam")
+    gebruikersnaamLabel.pack(side=LEFT)
+
+    codeLabel = Label(master=codeLoginFrame, text="Code")
+    codeLabel.pack(side=LEFT)
+
+    global codeLoginEntry
+    codeLoginEntry = Entry(master=codeLoginFrame,bd=5)
+    codeLoginEntry.pack(side = RIGHT)
+
+    inlogButton = Button(master=onderLoginFrame,command=loginGebruiker,text='Login',height=3,width=20)
+    inlogButton.pack(side=LEFT,pady=4,padx=25)
+
+    terugButton = Button(master=onderLoginFrame,command=vorigMenu,text='Vorig Menu',height=3,width=20)
+    terugButton.pack(side=RIGHT,pady=4,padx=25)
+
+    if keuze == 'aanbieder':
+        huidigMenu = 'Aanbieders Inlog Menu'
+        codeLabel['text'] = 'Wachtwoord'
+        informatieLoginLabel['text'] = 'Welkom film aanbieder,\nvul uw wachtwoord en gebruikersnaam in om verder te gaan.'
+        informatieLoginLabel['width'] = 60
+        inlogButton['command'] = loginAanbieder
 
 def hideLoginMenu(): # verberg het login menu
-    pass
+    bovenLoginFrame.destroy()
+    onderLoginFrame.destroy()
 
 def showAanbiedersMenu(): #speciaal menu voor de aanbieder, hierkan hij een overzicht zien van alle films die niet worden aangeboden door een andere aanbieder, overzicht van alle films, overzicht val alle bezoekers die bij deze aanbieder zitten, aanmeldcode controleren
     pass
@@ -281,6 +332,20 @@ def registeerGebruiker():
     # else
         # text bericht dat het niet gelukt is (kan alleen voorkomen als de gebruiker niet genoeg geld op zijn rekening heeft
 
+def loginGebruiker():
+    global berichtType
+    berichtType = 'Einde'
+
+    # if sql.login == True
+    hideLoginMenu()
+    showBerichtMenu()
+
+def loginAanbieder():
+    hideLoginMenu()
+    showAanbiedersMenu()
+
+    # if sql.login == True
+
 def vorigMenu():
     if huidigMenu == 'Kaart Menu':
         hideKaartMenu()
@@ -296,6 +361,9 @@ def vorigMenu():
         showBeginMenu()
     elif huidigMenu == 'Aanbieders Menu':
         hideAanbiedersMenu()
+        showBeginMenu()
+    elif huidigMenu == 'Einde':
+        hideBerichtMenu()
         showBeginMenu()
 
 def volgendMenu():

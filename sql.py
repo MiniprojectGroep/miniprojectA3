@@ -17,7 +17,7 @@ def startDatabase(databasename):
                          (gebruikersnaam text, email text, wachtwoord text, filmnaam text, filmstarttijd text, type text)''')
 
         c.execute('''CREATE TABLE IF NOT EXISTS films
-                        (filmnaam text, aanbiedersnaam text, filmstarttijd text, aantal_bezoekers int)''')
+                        (filmnaam text, aanbiedersnaam text, filmstarttijd text, filmdatum text, aantal_bezoekers int)''')
 
 def isLoginCorrect(gebruikersnaam, wachtwoord):
     import sqlite3
@@ -51,11 +51,9 @@ def isFilmInDatabase(film):
         c.execute('''SELECT filmnaam FROM films WHERE filmnaam = ? ''',gegevens)
         resultaten = c.fetchall()
 
-        # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data, eigenlijk overbodig maar dubbel check
         for resultaat in resultaten:
             if resultaat[0] == film:
                 connect.close()
-                # data van gebruikersnaam en wachtwoord wissen ivm security redenen
                 return True
         return False
 
@@ -67,7 +65,7 @@ def createFilmsTableData(lst):
         c = connect.cursor()
         for films in lst:
             if isFilmInDatabase(films[0]) == False:
-                c.execute('INSERT INTO films VALUES (?,?,?,?)', films)
+                c.execute('INSERT INTO films VALUES (?,?,?,?,?)', films)
         connect.commit()
         return True
 
@@ -156,7 +154,7 @@ def isAanbiederInDatabase(aanbieder):
         connect = sqlite3.connect(database)
         c = connect.cursor()
         gegevens = [aanbieder]
-        
+
         c.execute('''SELECT gebruikersnaam FROM accounts WHERE gebruikersnaam = ? AND type == 'aanbieder' ''',gegevens)
         resultaten = c.fetchall()
 

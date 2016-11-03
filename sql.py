@@ -19,7 +19,7 @@ def startDatabase(databasename):
         c.execute('''CREATE TABLE IF NOT EXISTS films
                         (filmnaam text, aanbiedersnaam text, filmstarttijd text, filmdatum text, aantal_bezoekers int)''')
 
-def isLoginCorrect(gebruikersnaam, wachtwoord):
+def isLoginCorrect(gebruikersnaam, wachtwoord): # Met dank aan Jeroen, aangepast door Nick om het beter te laten werken in een GUI omgeving
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -110,7 +110,7 @@ def isCodeUnique(code):
         return True
     return False
 
-def registreerGebruiker(lst):
+def registreerGebruiker(lst): # Met dank aan Jeroen, aangepast door Nick zodat het beter past in een GUI omgeving
     #try:
         import sqlite3
         database = 'Thuisbioscoop.db'

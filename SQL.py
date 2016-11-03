@@ -38,7 +38,7 @@ connect.commit()
 # Just be sure any changes have been committed or they will be lost.
 connect.close()
 
-CREATE TABLE (id INTEGER, bezoeker NAAM, film FILMOFTIJD)
+CREATE TABLE (id INTEGER, bezoeker TEXT, film INTEGER)
 
 INSERT INTO bezoeker VALUES (1, "Jack Pieters", 'filmoffilmtijdhier');
 INSERT INTO bezoeker VALUES (2, "Klaas Bergjes", 'filmoffilmtijdhier');
@@ -50,3 +50,5 @@ INSERT INTO bezoeker VALUES (7, "Frank Spijkerdop", 'filmoffilmtijdhier');
 INSERT INTO bezoeker VALUES (8, "Alberto Spaghetti", 'filmoffilmtijdhier');
 INSERT INTO bezoeker VALUES (9, "Gert Samson", 'filmoffilmtijdhier')
 INSERT INTO bezoeker VALUES (10, "Benny Vogelhuis", 'filmoffilmtijdhier')
+
+SELECT 4 from bezoeker;

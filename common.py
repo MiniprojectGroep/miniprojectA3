@@ -1,12 +1,9 @@
 # Alle algemene functies
 
 # Krijg een lijst met alle films van vandaag
-def getFilms(bestand):
+def getFilms(bestand): #
     import xmltodict
     import datetime
-
-    datetime.datetime.fromtimestamp(int("1284101485")).strftime('%Y-%m-%d %H:%M:%S')
-
 
     def processXML(filename):
         with open(filename) as myXMLFile:
@@ -41,7 +38,7 @@ def getFilms(bestand):
 
     return lst
 
-def getFilmsNames(bestand):
+def getFilmsNames(bestand): # Een lijst met alle film namen
     import xmltodict
     import datetime
 
@@ -67,7 +64,7 @@ def getFilmsNames(bestand):
 
     return lst
 
-def getFilmTableDataList(bestand):
+def getFilmTableDataList(bestand): #Zet diverse film data om in een lijst
     import xmltodict
     import datetime
 
@@ -94,5 +91,4 @@ def getFilmTableDataList(bestand):
         temp_list.append(datum)
         temp_list.append(0)
         lst.append(temp_list)
-
     return lst

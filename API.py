@@ -1,4 +1,4 @@
-def getAPIDataToXML(): # Met dank aan Arash, verbetert door Nick i.v.m. XML problemen
+def getAPIDataToXML():
     import requests
     import datetime
 
@@ -13,8 +13,7 @@ def getAPIDataToXML(): # Met dank aan Arash, verbetert door Nick i.v.m. XML prob
     response = requests.get(link)
 
     string = response.text
- # In de API wordt er soms (1-11-2016 en 2-11-2016 en 3-11-2016, zeer waarschijnlijk nogsteeds op 4-11-2016) een ' ; ' ,of er zit een encoding fout in het bestand, in het XML geleverd, als deze niet verwijdert of aangepast worden dan kan dit ervoor zorgen dat het XML bestand onleesbaar wordt
- # Het bovenstaande probleem wordt er gebruik gemaakt van replace, over een interne oplossing in de API is contact opgenomen met de developer van de API   
+ # In de API wordt er soms (1-11-2016 en 2-11-2016) een ' ; ' ,of er zit een encoding fout in het bestand, in het XML geleverd, als deze niet verwijdert of aangepast worden dan kan dit ervoor zorgen dat het XML bestand onleesbaar wordt
     string = string.replace('&eacute;', 'é') # &eacure; staat voor ' é '
     string = string.replace('&euml;','ë') # &euml; staat voor ' ë '
     string = string.replace('<?xml version="1.0" encoding="iso-8859-1"?>','<?xml version="1.0" encoding="UTF-8"?>' ) # zorgt ook voor en error??
@@ -26,4 +25,4 @@ def getAPIDataToXML(): # Met dank aan Arash, verbetert door Nick i.v.m. XML prob
         try:
             filmsXML.write(new_str)
         except:
-            print('Error in de API')
+            print('API kon niet succesvol worden opgehaalt')

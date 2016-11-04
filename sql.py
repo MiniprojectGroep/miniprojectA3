@@ -180,6 +180,24 @@ def getAantalBezoekers(filmnaam,datum):
             aantal_bezoekers = int(aantal_bezoekers)
             return aantal_bezoekers
 
+def getFilmAanbieder(filmnaam,datum):
+    import sqlite3
+    database = 'Thuisbioscoop.db'
+    if isDatabaseConnection(database) == True:
+        connect = sqlite3.connect(database,timeout=10)
+        c = connect.cursor()
+        gegevens = [filmnaam,datum]
+        c.execute('''SELECT aanbiedersnaam FROM films WHERE filmnaam = ? AND filmdatum = ?''',gegevens)
+        resultaten = c.fetchall()
+
+        # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data
+        for resultaat in resultaten:
+            aanbieder = str(resultaat)
+            aanbieder = aanbieder.replace('(','')
+            aanbieder = aanbieder.replace(')','')
+            aanbieder = aanbieder.replace(',','')
+            return aanbieder
+
 def setAantalBezoekers(filmnaam,datum,aantal_bezoekers_int):
     import sqlite3
     database = 'Thuisbioscoop.db'
@@ -187,7 +205,40 @@ def setAantalBezoekers(filmnaam,datum,aantal_bezoekers_int):
         connect = sqlite3.connect(database)
         c = connect.cursor()
         aantal_bezoekers_int += 1
-        gegevens = [str(aantal_bezoekers_int),filmnaam,datum]
         c.execute('''UPDATE films SET aantal_bezoekers = (?) WHERE filmnaam = (?) AND filmdatum = (?)''',(aantal_bezoekers_int, filmnaam, datum))
+        connect.commit()
+        connect.close()
+
+def getFilmsZonderAanbieder():
+    import sqlite3
+    database = 'Thuisbioscoop.db'
+    if isDatabaseConnection(database) == True:
+        connect = sqlite3.connect(database,timeout=10)
+        c = connect.cursor()
+        c.execute('''SELECT filmnaam FROM films WHERE aanbiedersnaam = '' ''')
+        resultaten = c.fetchall()
+
+        lst = []
+        i = 0
+        for resultaat in resultaten:
+            temp_lst = []
+            resultaat = str(resultaat)
+            resultaat = resultaat.replace('(','')
+            resultaat = resultaat.replace(')','')
+            resultaat = resultaat.replace(',','')
+            temp_lst.append(i)
+            temp_lst.append(resultaat)
+            lst.append(temp_lst)
+
+            i += 1
+        return lst
+
+def claimFilm(gebruikersnaam, filmnaam):
+    import sqlite3
+    database = 'Thuisbioscoop.db'
+    if isDatabaseConnection(database) == True:
+        connect = sqlite3.connect(database)
+        c = connect.cursor()
+        c.execute('''UPDATE films SET aanbiedersnaam = (?) WHERE filmnaam = (?)''',(gebruikersnaam, filmnaam))
         connect.commit()
         connect.close()

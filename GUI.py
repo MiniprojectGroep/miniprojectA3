@@ -269,6 +269,8 @@ def hideLoginMenu(): # verberg het login menu
 
 def showAanbiedersMenu(): #speciaal menu voor de aanbieder, hierkan hij een overzicht zien van alle films die niet worden aangeboden door een andere aanbieder, overzicht van alle films, overzicht val alle bezoekers die bij deze aanbieder zitten, aanmeldcode controleren
     # Inhoud afhankelijk van de resultaten die teamlid 4 (Nathan) moet inleveren
+    global huidigMenu
+    huidigMenu = 'Aanbieders Menu'
 
     global aanbiederFrame
     aanbiederFrame = Frame(master=root)
@@ -286,6 +288,7 @@ def showAanbiedersMenu(): #speciaal menu voor de aanbieder, hierkan hij een over
 
     global terugButton
     terugButton = Button(master=aanbiederFrame,command=vorigMenu,text='Ga terug')
+    terugButton.pack(side=RIGHT)
 
     scrollbar = Scrollbar(master=aanbiederFrame)
     scrollbar.pack( side = LEFT, fill=Y )
@@ -300,13 +303,13 @@ def showAanbiedersMenu(): #speciaal menu voor de aanbieder, hierkan hij een over
     scrollbar.config( command = filmZonderAanbiederListBox.yview )
 
 
-def filmsZonderAanbieder():
+def filmsZonderAanbieder(): # Een lijst met alle films de géén aanbieder is
     claimFilmButton.pack(side=RIGHT,pady=4,padx=25)
     filmsZonderAanbiederButton.destroy()
     filmZonderAanbiederListBox.pack(side = LEFT)
     aanbiederLabel.pack(side=TOP)
 
-def claimFilm():
+def claimFilm(): # Een aanbieder aan een film koppelen
     gebruikersnaam = aanbieder_gebruikersnaam
     tuple_getal = str(filmZonderAanbiederListBox.curselection())
     tuple_getal = tuple_getal.replace('(','')
@@ -448,7 +451,7 @@ def loginAanbieder():
 
     # if sql.login == True
 
-def vorigMenu():
+def vorigMenu(): # 1 functie voor alle "Terug" of "Vorige Menu" knoppen
     if huidigMenu == 'Kaart Menu':
         hideKaartMenu()
         showBeginMenu()
@@ -468,7 +471,7 @@ def vorigMenu():
         hideBerichtMenu()
         showBeginMenu()
 
-def volgendMenu():
+def volgendMenu(): # Zelfde structuur als vorige knop, wegens tijd gebrek niet volledig kunnen implementeren
     if huidigMenu == 'Code':
         hideBerichtMenu()
         showLoginMenu()

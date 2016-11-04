@@ -1,6 +1,7 @@
 # Modules
 from tkinter import *
 import random
+import datetime
 
 # Nodig voor een afbeelding
 from io import BytesIO
@@ -17,6 +18,10 @@ import common
 root = Tk()
 databaseNaam = 'Thuisbioscoop.db'
 xmlNaam = 'films.xml'
+
+nu = datetime.datetime.now()
+global datum
+datum = nu.strftime('%d-%m-%Y')
 
 # Alle Menu's (GUI windows)
 def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling of een ander bericht te weergeven
@@ -53,7 +58,7 @@ def showBerichtMenu(): # menu dat wordt gebruikt om de QR code, code na betaling
 
     elif berichtType == 'Einde':
         huidigMenu = 'Einde'
-        text = 'Uw film: {}\nStarttijd:{}\n\nBedankt voor het gebruiken van de filmbioscoop applicatie. Veel plezier met het kijken van uw film!'.format(filmNaamEnTijd[0],filmNaamEnTijd[1])
+        text = 'Uw film: {}\nStarttijd:{}\nDatum:{}\n\nBedankt voor het gebruiken van de filmbioscoop applicatie. Veel plezier met het kijken van uw film!'.format(filmNaamEnTijd[0],filmNaamEnTijd[1],filmNaamEnTijd[2])
 
         berichtButton = Button(master=berichtFrame,command=vorigMenu,text='Ga terug naar het begin menu',height=3,width=30,bg='darkorange')
         berichtButton.pack(side=BOTTOM,pady=4,padx=25)
@@ -256,7 +261,7 @@ def hideLoginMenu(): # verberg het login menu
     onderLoginFrame.destroy()
 
 def showAanbiedersMenu(): #speciaal menu voor de aanbieder, hierkan hij een overzicht zien van alle films die niet worden aangeboden door een andere aanbieder, overzicht van alle films, overzicht val alle bezoekers die bij deze aanbieder zitten, aanmeldcode controleren
-    pass
+    pass # Inhoud afhankelijk van de resultaten die teamlid 4 (Nathan) moet inleveren
 
 def hideAanbiedersMenu(): # verberg het AanbiedersMenu
     pass
@@ -297,8 +302,10 @@ def extraInfo():
     global filmStartTijd
     filmStartTijd = filmLijst[film][7]
 
+    aantal_bezoekers = sql.getAantalBezoekers(filmLijst[film][0],datum)
+
     # lst[x][0] = titel, lst[x][1] = genre, lst[x][2] = jaar, lst[x][3] = imdb_rating, lst[x][4] = afbeelding_URL, lst[x][5] = film_nummer (Wordt gebruikt voor ListBox), lst[x][6] = Zender, lst[x][7] = start tijd, lst[x][8] = eindtijd
-    text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}\n Prijs: €{}\n Duur: {} - {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3],prijs,filmLijst[film][7], filmLijst[film][8])
+    text = 'Titel: {} \nGenre: {}\n Jaar: {}\nIMDB rating: {}\n Al {} bezoekers gingen U voor!\n Prijs: €{}\n Duur: {} - {}'.format(filmLijst[film][0],filmLijst[film][1],filmLijst[film][2],filmLijst[film][3],aantal_bezoekers,prijs,filmLijst[film][7], filmLijst[film][8])
     kaartLabel['text'] = text
 
     # Nodig om een afbeelding via URL weer te geven
@@ -332,6 +339,7 @@ def registeerGebruiker():
     lst.append(filmtitel)
     lst.append(filmStartTijd)
     lst.append(keuze)
+    lst.append(datum)
 
     if gebruikersnaam == '' or email == '':
         print('U moet een gebruikersnaam of email invullen!') # label van maken
@@ -350,10 +358,7 @@ def loginGebruiker():
     gebruikersnaam = gebruikersnaamLoginEntry.get()
     wachtwoord = codeLoginEntry.get()
 
-    print(gebruikersnaam)
-    print(wachtwoord)
-
-    if sql.isLoginCorrect(gebruikersnaam, wachtwoord) == True:
+    if sql.isLoginCorrect(gebruikersnaam, wachtwoord,keuze) == True:
         global filmNaamEnTijd
         filmNaamEnTijd = sql.getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord)
 
@@ -366,8 +371,18 @@ def loginGebruiker():
         informatieLoginLabel['foreground'] = 'red'
 
 def loginAanbieder():
-    hideLoginMenu()
-    showAanbiedersMenu()
+    gebruikersnaam = gebruikersnaamLoginEntry.get()
+    wachtwoord = codeLoginEntry.get()
+
+    print(gebruikersnaam)
+    print(wachtwoord)
+
+    if sql.isLoginCorrect(gebruikersnaam, wachtwoord,keuze) == True:
+        hideLoginMenu()
+        showAanbiedersMenu()
+    else:
+        informatieLoginLabel['text'] = 'De opgegeven gebruikersnaam en/of wachtwoord is/zijn onjuist.\nProbeer het opnieuw'
+        informatieLoginLabel['foreground'] = 'red'
 
     # if sql.login == True
 

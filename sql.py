@@ -6,7 +6,7 @@ def isDatabaseConnection(databasename):
     except:
         return False
 
-def startDatabase(databasename):
+def startDatabase(databasename): # Maak tabellen aan als deze nog niet bestaan
     import sqlite3
     if isDatabaseConnection(databasename) == True:
         connect = sqlite3.connect(databasename)
@@ -19,7 +19,7 @@ def startDatabase(databasename):
         c.execute('''CREATE TABLE IF NOT EXISTS films
                         (filmnaam text, aanbiedersnaam text, filmstarttijd text, filmdatum text, aantal_bezoekers int)''')
 
-def isLoginCorrect(gebruikersnaam, wachtwoord,type):
+def isLoginCorrect(gebruikersnaam, wachtwoord,type): # Controleer of de opgegeven gegevens correct zijn
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -40,7 +40,7 @@ def isLoginCorrect(gebruikersnaam, wachtwoord,type):
                 return True
         return False
 
-def isFilmInDatabase(film):
+def isFilmInDatabase(film): # Kijk of de film al in de database is
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -57,7 +57,7 @@ def isFilmInDatabase(film):
                 return True
         return False
 
-def createFilmsTableData(lst):
+def createFilmsTableData(lst): # Voeg nieuwe films toe
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -69,7 +69,7 @@ def createFilmsTableData(lst):
         connect.commit()
         return True
 
-def getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord):
+def getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord): #Haal de film, filmstarttijd en filmdatum op van één gebruiker
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -90,9 +90,9 @@ def getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord):
                 lst.append(resultaat[3])
                 lst.append(resultaat[4])
                 return lst
-    return False
+    return False #
 
-def isCodeUnique(code):
+def isCodeUnique(code): # controleer of de code uniek is
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -103,7 +103,6 @@ def isCodeUnique(code):
         c.execute('''SELECT wachtwoord FROM accounts WHERE wachtwoord = ?''',gegevens)
         resultaten = c.fetchall()
 
-        # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data
         for resultaat in resultaten:
             if resultaat == code:
                 connect.close()
@@ -111,7 +110,7 @@ def isCodeUnique(code):
         return True
     return False
 
-def registreerGebruiker(lst):
+def registreerGebruiker(lst): # registeer een nieuwe gebruiker
         import sqlite3
         database = 'Thuisbioscoop.db'
         if isDatabaseConnection(database) == True:
@@ -145,7 +144,7 @@ def registeerAanbieders(): # Eenmalig, hoeft eigenlijk zelden gebruikt te worden
         return True
     return False
 
-def isAanbiederInDatabase(aanbieder):
+def isAanbiederInDatabase(aanbieder): # Bestaat de aanbieder al
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -161,7 +160,7 @@ def isAanbiederInDatabase(aanbieder):
                 return True
         return False
 
-def getAantalBezoekers(filmnaam,datum):
+def getAantalBezoekers(filmnaam,datum): # Krijg het aantal bezoekers van een film
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -180,7 +179,7 @@ def getAantalBezoekers(filmnaam,datum):
             aantal_bezoekers = int(aantal_bezoekers)
             return aantal_bezoekers
 
-def getFilmAanbieder(filmnaam,datum):
+def getFilmAanbieder(filmnaam,datum): # Krijg de aanbieder van een specifieke film
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -190,7 +189,6 @@ def getFilmAanbieder(filmnaam,datum):
         c.execute('''SELECT aanbiedersnaam FROM films WHERE filmnaam = ? AND filmdatum = ?''',gegevens)
         resultaten = c.fetchall()
 
-        # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data
         for resultaat in resultaten:
             aanbieder = str(resultaat)
             aanbieder = aanbieder.replace('(','')
@@ -198,7 +196,7 @@ def getFilmAanbieder(filmnaam,datum):
             aanbieder = aanbieder.replace(',','')
             return aanbieder
 
-def setAantalBezoekers(filmnaam,datum,aantal_bezoekers_int):
+def setAantalBezoekers(filmnaam,datum,aantal_bezoekers_int): # Verder het aantal bezoekers van een film
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -209,7 +207,7 @@ def setAantalBezoekers(filmnaam,datum,aantal_bezoekers_int):
         connect.commit()
         connect.close()
 
-def getFilmsZonderAanbieder():
+def getFilmsZonderAanbieder(): # Krijg een lijst van alle films die géén aanbieder hebben
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
@@ -233,7 +231,7 @@ def getFilmsZonderAanbieder():
             i += 1
         return lst
 
-def claimFilm(gebruikersnaam, filmnaam):
+def claimFilm(gebruikersnaam, filmnaam): # Een aanbieder naam veranderen in de films tabel
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:

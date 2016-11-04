@@ -14,20 +14,20 @@ def startDatabase(databasename):
         # Create table
 
         c.execute('''CREATE TABLE IF NOT EXISTS accounts
-                         (gebruikersnaam text, email text, wachtwoord text, filmnaam text, filmstarttijd text, type text)''')
+                         (gebruikersnaam text, email text, wachtwoord text, filmnaam text, filmstarttijd text, type text, datum text)''')
 
         c.execute('''CREATE TABLE IF NOT EXISTS films
                         (filmnaam text, aanbiedersnaam text, filmstarttijd text, filmdatum text, aantal_bezoekers int)''')
 
-def isLoginCorrect(gebruikersnaam, wachtwoord): # Met dank aan Jeroen, aangepast door Nick om het beter te laten werken in een GUI omgeving
+def isLoginCorrect(gebruikersnaam, wachtwoord,type):
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
         connect = sqlite3.connect(database)
         c = connect.cursor()
-        gegevens = [gebruikersnaam, wachtwoord]
+        gegevens = [gebruikersnaam, wachtwoord,type]
 
-        c.execute('''SELECT * FROM accounts WHERE gebruikersnaam = ? AND wachtwoord = ?''',gegevens)
+        c.execute('''SELECT * FROM accounts WHERE gebruikersnaam = ? AND wachtwoord = ? AND type = ?''',gegevens)
         resultaten = c.fetchall()
 
         # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data, eigenlijk overbodig maar dubbel check
@@ -77,7 +77,7 @@ def getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord):
         c = connect.cursor()
         gegevens = [gebruikersnaam, wachtwoord]
 
-        c.execute('''SELECT gebruikersnaam,wachtwoord,filmnaam,filmstarttijd FROM accounts WHERE gebruikersnaam = ? AND wachtwoord = ?''',gegevens)
+        c.execute('''SELECT gebruikersnaam,wachtwoord,filmnaam,filmstarttijd,datum FROM accounts WHERE gebruikersnaam = ? AND wachtwoord = ?''',gegevens)
         resultaten = c.fetchall()
 
         # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data
@@ -88,6 +88,7 @@ def getGebruikerFilmEnTijd(gebruikersnaam,wachtwoord):
                 lst = []
                 lst.append(resultaat[2])
                 lst.append(resultaat[3])
+                lst.append(resultaat[4])
                 return lst
     return False
 
@@ -110,39 +111,36 @@ def isCodeUnique(code):
         return True
     return False
 
-def registreerGebruiker(lst): # Met dank aan Jeroen, aangepast door Nick zodat het beter past in een GUI omgeving
-    #try:
+def registreerGebruiker(lst):
         import sqlite3
         database = 'Thuisbioscoop.db'
         if isDatabaseConnection(database) == True:
             connect = sqlite3.connect(database)
             c = connect.cursor()
-            c.execute('INSERT INTO accounts VALUES (?,?,?,?,?,?)', lst)
+            c.execute('INSERT INTO accounts VALUES (?,?,?,?,?,?,?)', lst)
             connect.commit()
+            aantal_bezoekers = getAantalBezoekers(str(lst[3]),str(lst[6]))
+            setAantalBezoekers(str(lst[3]),str(lst[6]),aantal_bezoekers) #veroorzaakt een error waardoor je de error krijgt "database is locked", ivm met tijd gebrek geen fix meer kunnen vinden
             connect.close()
             return True
         else:
             return False
-    #except:
-        #return False
 
-def registeerAanbieders():
+def registeerAanbieders(): # Eenmalig, hoeft eigenlijk zelden gebruikt te worden aangezien aanbieders hetzelfde blijven
     aanbieders = [
-        ['Nick','nick@hotmail.nl','kaasbroodje13','','','aanbieder'],
-        ['Piet Jan', 'pietjan@gmail.com','arash','','','aanbieder'],
-        ['Nathan', 'nathan@gmail.com','pizzaburger','','','aanbieder'],
-        ['Jeroen','jeroen@hotmail.nl','computerlaptop','','','aanbieder']
+        ['Nick','nick@hotmail.nl','kaasbroodje13','','','aanbieder','04-11-2016'],
+        ['Piet Jan', 'pietjan@gmail.com','arash','','','aanbieder','04-11-2016'],
+        ['Nathan', 'nathan@gmail.com','pizzaburger','','','aanbieder','04-11-2016'],
+        ['Jeroen','jeroen@hotmail.nl','computerlaptop','','','aanbieder','04-11-2016']
     ]
     import sqlite3
     database = 'Thuisbioscoop.db'
     if isDatabaseConnection(database) == True:
         connect = sqlite3.connect(database)
         c = connect.cursor()
-        print(aanbieders)
         for aanbieder in aanbieders:
-            print(aanbieder)
             if isAanbiederInDatabase(aanbieder[0]) == False:
-                c.execute('INSERT INTO accounts VALUES (?,?,?,?,?,?)', aanbieder)
+                c.execute('INSERT INTO accounts VALUES (?,?,?,?,?,?,?)', aanbieder)
         connect.commit()
         return True
     return False
@@ -162,3 +160,34 @@ def isAanbiederInDatabase(aanbieder):
             if resultaat[0] == aanbieder:
                 return True
         return False
+
+def getAantalBezoekers(filmnaam,datum):
+    import sqlite3
+    database = 'Thuisbioscoop.db'
+    if isDatabaseConnection(database) == True:
+        connect = sqlite3.connect(database,timeout=10)
+        c = connect.cursor()
+        gegevens = [filmnaam,datum]
+        c.execute('''SELECT aantal_bezoekers FROM films WHERE filmnaam = ? AND filmdatum = ?''',gegevens)
+        resultaten = c.fetchall()
+
+        # controleer of gebruikersnaam EN wachtwoord overeenkomen met de opgegeven data
+        for resultaat in resultaten:
+            aantal_bezoekers = str(resultaat)
+            aantal_bezoekers = aantal_bezoekers.replace('(','')
+            aantal_bezoekers = aantal_bezoekers.replace(')','')
+            aantal_bezoekers = aantal_bezoekers.replace(',','')
+            aantal_bezoekers = int(aantal_bezoekers)
+            return aantal_bezoekers
+
+def setAantalBezoekers(filmnaam,datum,aantal_bezoekers_int):
+    import sqlite3
+    database = 'Thuisbioscoop.db'
+    if isDatabaseConnection(database) == True:
+        connect = sqlite3.connect(database)
+        c = connect.cursor()
+        aantal_bezoekers_int += 1
+        gegevens = [str(aantal_bezoekers_int),filmnaam,datum]
+        c.execute('''UPDATE films SET aantal_bezoekers = (?) WHERE filmnaam = (?) AND filmdatum = (?)''',(aantal_bezoekers_int, filmnaam, datum))
+        connect.commit()
+        connect.close()
